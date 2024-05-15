@@ -1,10 +1,14 @@
 import pandas as pd
+import numpy as np
 
+# Table 2 as a dataFrame
 data = {'t': [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5],
         'x': [0, 4.3, 10.2, 17.2, 26.2, 33.1, 39.1]}
 df = pd.DataFrame.from_dict(data)
 
+# Constant delta
 delta = 0.5 - 0.25
+# Velocity list for three point formula
 velocity3 = []
 
 # Three-point formulas for velocity. Endpoint for first and last point, midpoint for rest of the points.
@@ -17,8 +21,9 @@ for i in range(7):
         else:
                 velocity3.append(round((1 / (2 * -delta)) * (-3 * data['x'][i] + 4 * data['x'][i-1] - data['x'][i-2]), 4))
 
-df['Velocity_Three_Point(m/s)'] = velocity3
+df['Velo_Three_Point(m/s)'] = velocity3
 
+# Velocity list for 5 point formula
 velocity5 = []
 # Five-point formulas for velocity. Midpoint formula for x=10.2, x=17.2, x=26.2
 # Endpoint formula for x = 0.0, x= 4.3(Forward), x=33.1, x=39.1(Backward)
@@ -30,7 +35,7 @@ for k in range(7):
         elif k == 5 or k == 6:
                 velocity5.append(round((1 / (12 * -delta)) * (-25 * data['x'][k] + 48 * data['x'][k-1] - 36 * data['x'][k-2] + 16 * data['x'][k-3] - 3 * data['x'][k-4]), 4))
 
-df['Velocity_Five_Point(m/s)'] = velocity5
+df['Velo_Five_Point(m/s)'] = velocity5
 
 # Acceleration will be calculated both Three-point and Five-point velocity values.
 
@@ -42,8 +47,8 @@ def acc_forward(v):
                 acc_f.append(round(((v[n+1] - v[n]) / delta), 4))
         acc_f.append(None)
         return acc_f
-df["Acceleration_Forward_TP"] = acc_forward(velocity3)
-df["Acceleration_Forward_FP"] = acc_forward(velocity5)
+df["Acc_F_TP"] = acc_forward(velocity3)
+df["Acc_F_FP"] = acc_forward(velocity5)
 
 def acc_backward(v):
         acc_b = []
@@ -51,8 +56,8 @@ def acc_backward(v):
         for n in range(1,7):
                 acc_b.append(round(((v[n] - v[n-1]) / delta), 4))
         return acc_b
-df["Acceleration_Backward_TP"] = acc_backward(velocity3)
-df["Acceleration_Backward_FP"] = acc_backward(velocity5)
+df["Acc_B_TP"] = acc_backward(velocity3)
+df["Acc_B_FP"] = acc_backward(velocity5)
 
 def acc_central(v):
         acc_c = []
@@ -61,7 +66,7 @@ def acc_central(v):
                 acc_c.append(round(((v[n+1] - v[n-1]) / (2 * delta)), 4))
         acc_c.append(None)
         return acc_c
-df["Acceleration_Central_TP"] = acc_central(velocity3)
-df["Acceleration_Central_FP"] = acc_central(velocity5)
+df["Acc_C_TP"] = acc_central(velocity3)
+df["Acc_C_FP"] = acc_central(velocity5)
 
 print(df)
